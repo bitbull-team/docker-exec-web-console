@@ -1,0 +1,87 @@
+<html>
+<head>
+    <link rel="stylesheet" href="xterm/xterm.css" />
+    <script src="xterm/xterm.js"></script>
+    <style>
+    body {
+        padding: 0;
+        margin: 5px;
+        background-color: #000;
+    }
+    
+    #container-terminal {
+		width: 800px;
+		height: 450px;
+		margin: 0;
+		padding: 0;
+	}
+    </style>
+</head>
+<body>
+    <div id="container-terminal"></div>
+    
+    <script type="text/javascript">
+		var term, websocket, containerId = '', command = '';
+		
+        function getQueryVar(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i=0; i<vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) {
+                     return pair[1];
+                }
+            }
+            
+            return false;
+        }
+        
+        containerId = getQueryVar('cid');
+        if (!containerId) {
+            containerId = prompt('Container ID');
+        }
+        
+        command = getQueryVar('cmd');
+        if (!command) {
+            command = '/bin/bash';
+        }
+
+		websocket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/exec/" + containerId + ',' + window.btoa(command));
+
+        websocket.onopen = function(evt) {
+			term = new Terminal({
+				//cols: 100,
+				//rows: 30,
+				screenKeys: true,
+				useStyle: true,
+				cursorBlink: true,
+			});
+			
+			term.on('data', function(data) {
+				websocket.send(data);
+			});
+			
+			term.on('title', function(title) {
+				document.title = title;
+			});
+			
+			term.open(document.getElementById('container-terminal'));
+			
+			websocket.onmessage = function(evt) {
+				term.write(evt.data);
+			}
+			
+			websocket.onclose = function(evt) {
+				term.write("Session terminated");
+				term.destroy();
+			}
+			
+			websocket.onerror = function(evt) {
+				if (typeof console.log == "function") {
+					console.log(evt)
+				}
+			}
+		}
+    </script>
+    </body>
+</html>
