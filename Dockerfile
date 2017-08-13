@@ -1,4 +1,5 @@
 FROM alpine:latest
+MAINTAINER Gennaro Vietri <gennaro.vietri@bitbull.it>
 
 RUN apk --update add socat
 

@@ -16,6 +16,7 @@
 		padding: 0;
 	}
     </style>
+    <title>Docker Exec Web Console</title>
 </head>
 <body>
     <div id="container-terminal"></div>
@@ -46,7 +47,7 @@
             command = '/bin/bash';
         }
 
-		websocket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/exec/" + containerId + ',' + window.btoa(command));
+	websocket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + window.location.pathname + "exec/" + containerId + ',' + window.btoa(command));
 
         websocket.onopen = function(evt) {
 			term = new Terminal({
