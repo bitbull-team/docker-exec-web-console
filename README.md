@@ -22,7 +22,7 @@ It's possible to pass a context path to which the container will responds, using
 docker run \
 	--name docker-exec-web-console \
 	-p 9999:8888 \
-	-e "CONTEXT_PATH=/webconsole"
+	-e "CONTEXT_PATH=/webconsole" \
 	-v /var/run/docker.sock:/var/run/docker.sock \
 	bitbull/docker-exec-web-console
 ```
