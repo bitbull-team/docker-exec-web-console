@@ -1,4 +1,4 @@
-<html>
+<html lang="en">
 <head>
   <link rel="stylesheet" href="xterm/xterm.css"/>
   <script src="xterm/xterm.js"></script>
@@ -22,7 +22,6 @@
 <div id="container-terminal"></div>
 
 <script type="text/javascript">
-  let term, websocket, containerId = '', command = '';
 
   function getQueryVar(variable) {
     const query = window.location.search.substring(1);
@@ -37,17 +36,17 @@
     return false;
   }
 
-  containerId = getQueryVar('cid');
+  let containerId = getQueryVar('cid');
   if (!containerId) {
     containerId = prompt('Container ID');
   }
 
-  command = getQueryVar('cmd');
+  let command = getQueryVar('cmd');
   if (!command) {
     command = '/bin/bash';
   }
 
-  websocket = new WebSocket(
+  let websocket = new WebSocket(
       "ws://"
       + window.location.hostname + ":"
       + window.location.port
@@ -56,8 +55,8 @@
       + containerId + ',' + window.btoa(command)
   );
 
-  websocket.onopen = function (evt) {
-    term = new Terminal({
+  websocket.onopen = function () {
+    let term = new Terminal({
       //cols: 100,
       //rows: 30,
       screenKeys: true,
@@ -79,7 +78,7 @@
       term.write(evt.data);
     }
 
-    websocket.onclose = function (evt) {
+    websocket.onclose = function () {
       term.write("Session terminated");
       term.destroy();
     }
