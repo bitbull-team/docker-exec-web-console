@@ -1,10 +1,9 @@
 package main
 
 import (
-	"os"
 	"bytes"
-	"encoding/json"
 	"encoding/base64"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -12,8 +11,9 @@ import (
 	"net"
 	"net/http"
 	"net/http/httputil"
-	"time"
+	"os"
 	"strings"
+	"time"
 
 	"github.com/davecgh/go-spew/spew"
 	"golang.org/x/net/websocket"
@@ -31,18 +31,18 @@ func main() {
 		contextPath = strings.TrimRight(cp, "/")
 	}
 
-	http.Handle(contextPath + "/exec/", websocket.Handler(ExecContainer))
-        http.Handle(contextPath + "/", http.StripPrefix(contextPath + "/", http.FileServer(http.Dir("./"))))
+	http.Handle(contextPath+"/exec/", websocket.Handler(ExecContainer))
+	http.Handle(contextPath+"/", http.StripPrefix(contextPath+"/", http.FileServer(http.Dir("./"))))
 	if err := http.ListenAndServe(":"+*port, nil); err != nil {
 		panic(err)
 	}
 }
 
 func ExecContainer(ws *websocket.Conn) {
-	wsParams := strings.Split(ws.Request().URL.Path[len(contextPath + "/exec/"):], ",")
-	container := wsParams[0]	
+	wsParams := strings.Split(ws.Request().URL.Path[len(contextPath+"/exec/"):], ",")
+	container := wsParams[0]
 	cmd, _ := base64.StdEncoding.DecodeString(wsParams[1])
-		
+
 	if container == "" {
 		ws.Write([]byte("Container does not exist"))
 		return
@@ -52,7 +52,7 @@ func ExecContainer(ws *websocket.Conn) {
 	}
 	var s stuff
 	params := bytes.NewBufferString("{\"AttachStdin\":true,\"AttachStdout\":true,\"AttachStderr\":true,\"Tty\":true,\"Cmd\":[\"" + string(cmd) + "\"]}")
-	resp, err := http.Post("http://" + *host + "/containers/" + container + "/exec", "application/json", params)
+	resp, err := http.Post("http://"+*host+"/containers/"+container+"/exec", "application/json", params)
 	if err != nil {
 		panic(err)
 	}
